@@ -11,14 +11,18 @@
 
 
 SERVICE_NAME=$(basename $0)
-RUN_CMD=
-IS_CMD_CAPABLE="yes"
+RUN_CMD="sleep 100"
+#IS_CMD_CAPABLE="yes"
+IS_CMD_CAPABLE="no"
+
 PID_FILE=/var/run/${SERVICE_NAME}.pid
 LOG_FILE=/var/log/${SERVICE_NAME}.log
-RUN_AS_USER=<USERNAME>
+RUN_AS_USER=root
 WORK_DIR=/
 SOFT_STOP_SIGNAL=SIGINT
 HARD_STOP_SIGNAL=SIGKILL
+
+set -x
 
 function get_pid()
 {
@@ -34,18 +38,18 @@ function delete_pid_file()
 
 function is_running()
 {
-	kill -0 $(get_pid)
+	kill -0 $(get_pid) &> /dev/null
 }
 
 function start_capable_service()
 {
-	sudo -u $RUN_AS_USER "$RUN_CMD"
+	sudo -u $RUN_AS_USER bash -c "$RUN_CMD"
 }
 
 function start_incapable_service()
 {
-	local CMD="${RUN_CMD} &> \"$LOG_FILE\" & echo \$!"
-	sudo -u $RUN_AS_USER "$CMD" > "$PID_FILE"
+	local CMD="${RUN_CMD} &> \"$LOG_FILE\" & echo \$! > \"$PID_FILE\""
+	sudo -u $RUN_AS_USER bash -c "$CMD"
 }
 
 function start()
@@ -60,7 +64,7 @@ function start()
 	echo "Starting $SERVICE_NAME"
 	cd $WORK_DIR
 
-	if [ $IS_CMD_CAPABLE == "yes" ] then;
+	if [ $IS_CMD_CAPABLE == "yes" ]; then
 		start_capable_service
 	else
 		start_incapable_service
