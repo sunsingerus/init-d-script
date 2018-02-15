@@ -15,14 +15,20 @@ RUN_CMD="sleep 100"
 #IS_CMD_CAPABLE="yes"
 IS_CMD_CAPABLE="no"
 
-PID_FILE=/var/run/${SERVICE_NAME}.pid
-LOG_FILE=/var/log/${SERVICE_NAME}.log
-RUN_AS_USER=root
+PID_FILE=/var/run/${SERVICE_NAME}/${SERVICE_NAME}.pid
+LOG_FILE=/var/log/${SERVICE_NAME}/${SERVICE_NAME}.log
+RUN_CMD_AS_USER=root
 WORK_DIR=/
 SOFT_STOP_SIGNAL=SIGINT
 HARD_STOP_SIGNAL=SIGKILL
+DEBUG="no"
+DEBUG="yes"
 
-set -x
+
+function is_root()
+{
+	[ "$EUID" -eq 0 ]
+}
 
 function get_pid()
 {
@@ -43,13 +49,13 @@ function is_running()
 
 function start_capable_service()
 {
-	sudo -u $RUN_AS_USER bash -c "$RUN_CMD"
+	sudo -u $RUN_CMD_AS_USER bash -c "$RUN_CMD"
 }
 
 function start_incapable_service()
 {
 	local CMD="${RUN_CMD} &> \"$LOG_FILE\" & echo \$! > \"$PID_FILE\""
-	sudo -u $RUN_AS_USER bash -c "$CMD"
+	sudo -u $RUN_CMD_AS_USER bash -c "$CMD"
 }
 
 function start()
@@ -117,6 +123,15 @@ function restart()
 	stop
 	start
 }
+
+if [ "$DEBUG" == "yes" ]; then
+	set -x
+fi
+
+if ! is_root; then
+	echo "Please run as root"
+	exit 1
+fi
 
 case "$1" in
 	start)
