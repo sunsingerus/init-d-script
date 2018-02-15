@@ -76,7 +76,7 @@ function start_incapable_service()
 function start()
 {
 	if is_running; then
-		echo -n "$SERVICE_NAME already running as: "
+		echo "$SERVICE_NAME already running as: "
 		ps -p $(get_pid)
 		echo
 		exit 1
@@ -149,6 +149,24 @@ function restart()
 	start
 }
 
+function status()
+{
+	echo "$SERVICE_NAME status"
+	if is_running; then
+		echo "$SERVICE_NAME is running as: "
+		ps -p $(get_pid)
+		echo
+	else
+		# is not running
+		PID=$(get_pid)
+		if [ -z "$PID" ]; then
+			echo "$SERVICE_NAME is not running"
+		else
+			echo "$SERVICE_NAME is not running, but PID file $PID_FILE exists"
+		fi
+	fi
+}
+
 if [ "$DEBUG" == "yes" ]; then
 	set -x
 	set -e
@@ -172,7 +190,10 @@ case "$1" in
 	retart)
 		restart
 		;;
+	status)
+		status
+		;;
 	*)
-		echo "Usage: $0 {start|stop|stop_hard|restart}"
+		echo "Usage: $0 {start|stop|stop_hard|restart|status}"
 esac
 
