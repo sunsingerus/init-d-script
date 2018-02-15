@@ -13,16 +13,19 @@
 #SERVICE_NAME=$(basename $0)
 SERVICE_NAME=sleep_service
 
+PID_FILE=/var/run/${SERVICE_NAME}/${SERVICE_NAME}.pid
+LOG_FILE=/var/log/${SERVICE_NAME}/${SERVICE_NAME}.log
+
 RUN_CMD="sleep 100"
 #IS_CMD_CAPABLE="yes"
 IS_CMD_CAPABLE="no"
 
-PID_FILE=/var/run/${SERVICE_NAME}/${SERVICE_NAME}.pid
-LOG_FILE=/var/log/${SERVICE_NAME}/${SERVICE_NAME}.log
 RUN_CMD_AS_USER=user
 WORK_DIR=/
+
 SOFT_STOP_SIGNAL=SIGINT
 HARD_STOP_SIGNAL=SIGKILL
+
 DEBUG="no"
 #DEBUG="yes"
 
@@ -113,14 +116,14 @@ function start()
 
 function stop()
 {
-	STOP_SIGNAL=$1
+	local STOP_SIGNAL=$1
 
 	if ! is_running; then
 		echo "$SERVICE_NAME is not running"
 		exit 1
 	fi
 
-	echo "Send ${STOP_SIGNAL} to $SERVICE_NAME"
+	echo "Send $STOP_SIGNAL to $SERVICE_NAME"
 	kill -${STOP_SIGNAL} $(get_pid)
 
 	echo "Wait for $SERVICE_NAME to exit"
@@ -158,7 +161,7 @@ function status()
 		echo
 	else
 		# is not running
-		PID=$(get_pid)
+		local PID=$(get_pid)
 		if [ -z "$PID" ]; then
 			echo "$SERVICE_NAME is not running"
 		else
