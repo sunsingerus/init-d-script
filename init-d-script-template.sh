@@ -10,19 +10,21 @@
 ### END INIT INFO
 
 
-SERVICE_NAME=$(basename $0)
+#SERVICE_NAME=$(basename $0)
+SERVICE_NAME=sleep_service
+
 RUN_CMD="sleep 100"
 #IS_CMD_CAPABLE="yes"
 IS_CMD_CAPABLE="no"
 
 PID_FILE=/var/run/${SERVICE_NAME}/${SERVICE_NAME}.pid
 LOG_FILE=/var/log/${SERVICE_NAME}/${SERVICE_NAME}.log
-RUN_CMD_AS_USER=root
+RUN_CMD_AS_USER=user
 WORK_DIR=/
 SOFT_STOP_SIGNAL=SIGINT
 HARD_STOP_SIGNAL=SIGKILL
 DEBUG="no"
-DEBUG="yes"
+#DEBUG="yes"
 
 
 function is_root()
@@ -40,6 +42,19 @@ function delete_pid_file()
 	if [ -f "$PID_FILE" ]; then
 		rm "$PID_FILE"
 	fi
+}
+
+function is_fs_item_writable_by_user()
+{
+	local FS_ITEM_PATH=$1
+	sudo -u $RUN_CMD_AS_USER bash -c "[ -w \"$FS_ITEM_PATH\" ]"
+}
+
+function is_file_usable()
+{
+	local FILE=$1
+	local DIR=$(dirname "${FILE}")
+	is_fs_item_writable_by_user "$FILE" || is_fs_item_writable_by_user "$DIR"
 }
 
 function is_running()
@@ -64,6 +79,16 @@ function start()
 		echo -n "$SERVICE_NAME already running as: "
 		ps -p $(get_pid)
 		echo
+		exit 1
+	fi
+
+	if ! is_file_usable "$LOG_FILE"; then
+		echo "Log file $LOG_FILE is not writable by user $RUN_CMD_AS_USER. Please check path"
+		exit 1
+	fi
+
+	if ! is_file_usable "$PID_FILE"; then
+		echo "Pid file $PID_FILE is not writable by user $RUN_CMD_AS_USER. Please check path"
 		exit 1
 	fi
 
@@ -126,6 +151,7 @@ function restart()
 
 if [ "$DEBUG" == "yes" ]; then
 	set -x
+	set -e
 fi
 
 if ! is_root; then
