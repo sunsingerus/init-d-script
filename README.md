@@ -1,5 +1,6 @@
-# init-d-script
-init.d script template
+# What is it?
+
+System V init.d script template, systemd unit script template
 
 # systemd
 Put service file into `/etc/systemd/system/`
