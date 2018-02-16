@@ -4,12 +4,12 @@ System V init.d script template, systemd unit script template
 
 # systemd
 Put service file into `/etc/systemd/system/`
-Check service status with
+Check service status with:
 ```bash
 systemctl status <service name>
 ```
 
-In case servuce is `disbaled` - need to enable it
+In case service is `disabled` - need to enable it
 ```bash
 systemctl enable <service name>
 ```
