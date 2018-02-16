@@ -1,3 +1,8 @@
+# man 5 systemd.unit
+# man 5 systemd.service
+# man 5 systemd.install
+# man systemctl
+
 [Unit]
 
 Description=Describe what is this as verbose as you wish
@@ -25,6 +30,10 @@ ExecStart=/path/to/cmd --with-options
 
 # Command to reload the service
 #ExecReload=
+
+#ExecStartPre=
+#ExecStartPost=
+#ExecStopPost=
 
 # How long to wait for start/stop command(s)
 #TimeoutSec=300
