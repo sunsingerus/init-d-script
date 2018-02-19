@@ -48,7 +48,7 @@ Restart=always
 
 # Run service as `sudo`
 User=user
-Group=group
+Group=user
 
 # Service is a simple one and can't fork by itself
 #Type=simple
