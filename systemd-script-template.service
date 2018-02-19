@@ -44,9 +44,11 @@ KillMode=process
 Restart=always
 #Restart=on-failure
 
+#RestartSec=30
+
 # Run service as `sudo`
-User=altinity
-Group=altinity
+User=user
+Group=group
 
 # Service is a simple one and can't fork by itself
 #Type=simple
@@ -67,6 +69,9 @@ WorkingDirectory=/path/to/work/dir
 # -1000 : do not kill this service at all (like sshd)
 # IMPORTANT: touch this in case of real need only
 #OOMScoreAdjust=-100
+
+#LimitCORE=infinity
+#LimitNOFILE=500000
 
 [Install]
 
