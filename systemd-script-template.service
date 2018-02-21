@@ -26,7 +26,18 @@ Requires=mysql.service
 ExecStart=/path/to/cmd --with-options
 
 # Command to stop the the service
-#ExecStop=
+# If this option is not specified, the process is terminated by sending the signal specified in KillSignal=
+# Specifier and environment variable substitution is supported (including $MAINPID)
+#ExecStop=/bin/kill -SIGINT $(cat /var/run/clickhouse-mysql/clickhouse-mysql.pid)
+
+# Specifies which signal to use when killing a service. This controls the signal that is sent as first step of shutting down a unit
+KillSignal=SIGINT
+
+# Possible values: control-group, process, mixed, none
+KillMode=process
+
+# Whether to send SIGKILL to remaining processes after a timeout, if the normal shutdown procedure left processes of the service around
+SendSIGKILL=yes
 
 # Command to reload the service
 #ExecReload=
@@ -37,8 +48,6 @@ ExecStart=/path/to/cmd --with-options
 
 # How long to wait for start/stop command(s)
 #TimeoutSec=300
-
-KillMode=process
 
 # How to restart the service in case it is down/ Check by PID file
 Restart=always
@@ -75,7 +84,7 @@ WorkingDirectory=/path/to/work/dir
 
 [Install]
 
-Alias=clicktail clicktail.service
+Alias=clickhouse-mysql clickhouse-mysql.service
 
 # runtime level
 # multi-user.target is the same as old known runlevel=3
